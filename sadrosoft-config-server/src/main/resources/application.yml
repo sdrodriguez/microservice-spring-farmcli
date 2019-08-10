@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          #uri: file:///E:/ConfigServer
+          uri: https://github.com/rs-rodriguez/ConfigServer.git
+server:
+  port: 8888
