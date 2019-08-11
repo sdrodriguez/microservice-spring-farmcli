@@ -18,6 +18,15 @@ zuul:
     items:
       service-id: farmcli-service-items
       path: /api/items/**
+    users:
+      service-id: farmcli-service-users
+      path: /api/usr/**
+    security:
+      service-id: farmcli-service-oauth
+      path: /api/security/**
+      sensitive-headers:
+      - Cookie
+      - Set-Cookie
       
 #hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 200000
 #ribbon:
