@@ -5,5 +5,6 @@ import sv.com.sadrosoft.users.commons.models.entity.SgUser;
 public interface IUserService {
 	
 	public SgUser findByUserName(String username);
+	public SgUser update (SgUser sgUser, Long id);
 
 }

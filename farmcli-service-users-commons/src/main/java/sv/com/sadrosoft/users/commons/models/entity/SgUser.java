@@ -42,6 +42,8 @@ public class SgUser implements Serializable{
 	uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id","rol_id"})})
 	private List<SgRole> rols;
 	
+	private Integer countsLogin;
+	
 	public Long getId() {
 		return id;
 	}
@@ -90,6 +92,12 @@ public class SgUser implements Serializable{
 	}
 	public void setRols(List<SgRole> rols) {
 		this.rols = rols;
+	}
+	public Integer getCountsLogin() {
+		return countsLogin;
+	}
+	public void setCountsLogin(Integer countsLogin) {
+		this.countsLogin = countsLogin;
 	}
 	
 	
