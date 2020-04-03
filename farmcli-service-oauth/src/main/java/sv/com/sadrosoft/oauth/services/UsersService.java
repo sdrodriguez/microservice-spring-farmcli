@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import brave.Tracer;
+import feign.FeignException;
 import sv.com.sadrosoft.oauth.clients.UsersClient;
 import sv.com.sadrosoft.users.commons.models.entity.SgUser;
 
@@ -25,22 +27,29 @@ public class UsersService implements IUserService, UserDetailsService {
 	@Autowired
 	private UsersClient client;
 	
+	@Autowired
+	private Tracer tracer;
+	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		SgUser user = client.findByUserName(username);
-		if(user == null) {
-			log.error("Error for login, because not exist user: " + username);
+
+		try {
+			SgUser user = client.findByUserName(username);
+			List<GrantedAuthority> authorities = user.getRols().stream()
+					.map(role -> new SimpleGrantedAuthority(role.getRolname()))
+					.peek(authority -> log.info("Role: " + authority.getAuthority()))
+					.collect(Collectors.toList());
+			return new User(user.getSgUserName(),
+					user.getPassword(),
+					user.getEnabled(),
+					true,true,true,
+					authorities);
+		} catch (FeignException e) {
+			String error = "Error for login, because not exist user: " + username;
+			log.error(error);
+			tracer.currentSpan().tag("error.mensaje", error);
 			throw new UsernameNotFoundException("Error for login, because not exist user: " + username);
 		}
-		List<GrantedAuthority> authorities = user.getRols().stream()
-				.map(role -> new SimpleGrantedAuthority(role.getRolname()))
-				.peek(authority -> log.info("Role: " + authority.getAuthority()))
-				.collect(Collectors.toList());
-		return new User(user.getSgUserName(),
-				user.getPassword(),
-				user.getEnabled(),
-				true,true,true,
-				authorities);
 	}
 
 	@Override
